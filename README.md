@@ -4,6 +4,25 @@
 
 收到数值选择挑战时，它按请求体里的模型名从该模型的参考指纹里生成一串 1..355 的整数，让 [lm-detector](https://github.com/Ikaleio/lm-detector) 之类的检测器把响应认成那个模型；其余请求一律返回固定文本。
 
+## 前端静态站
+
+`web/` 是从 [New API](https://github.com/QuantumNous/new-api) 前端移植来的纯静态站点，站点名为「滚木 API」，首页标语是「你说的每一句话，都是滚木」。保留首页、模型价格表、关于与错误页，去掉了登录、控制台与排行榜；站点状态与模型定价来自 `web/src/static/` 的内置常量，不发后端请求。
+
+```sh
+cd web
+bun install
+bun run dev                 # 本地开发
+bun run build               # 产物在 web/dist
+bun run typecheck
+```
+
+`web/dist` 是纯静态文件，可放到任意静态托管。`web/public/_redirects` 提供 Cloudflare Pages 的 SPA 回退。
+
+```sh
+cd web
+npx wrangler pages deploy dist --project-name=rollwood-api
+```
+
 ## 接口
 
 | 方法 | 路径 | 说明 |
