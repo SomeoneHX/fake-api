@@ -6,6 +6,9 @@
   "rules": [
     { "type": "Text", "globs": ["**/*.txt"], "fallthrough": true }
   ],
+  "routes": [
+    { "pattern": "ai.sohx.asia", "custom_domain": true }
+  ],
   "vars": {
     "API_KEY": "",
     "FALLBACK_TEXT": "这是一个演示用的 OpenAI 兼容接口。除数值选择任务外，所有请求都会返回这段固定文本。",

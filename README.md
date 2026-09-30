@@ -51,11 +51,14 @@ npm run typecheck    # 类型检查
 npm run deploy       # 发布到 Cloudflare
 ```
 
+线上地址 <https://ai.sohx.asia>，在 `wrangler.jsonc` 的 `routes` 里以 `custom_domain: true` 声明，证书与 DNS 由 Cloudflare 自动配置。声明自定义域名后 Wrangler 默认不再开通 workers.dev，因此没有备用地址；需要时加 `"workers_dev": true`。
+
 用 lm-detector 检测：
 
 ```sh
-npx lmfpd@latest -b https://<worker 地址>/v1 -k sk-anything -m gpt-4o
-npx lmfpd@latest -b https://<worker 地址>/v1 -k sk-anything -m gpt-4o -a cc
+curl https://ai.sohx.asia/health
+npx lmfpd@latest -b https://ai.sohx.asia/v1 -k sk-anything -m gpt-4o
+npx lmfpd@latest -b https://ai.sohx.asia/v1 -k sk-anything -m gpt-4o -a cc
 ```
 
 ## 指纹数据
