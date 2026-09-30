@@ -16,11 +16,11 @@ bun run build               # 产物在 web/dist
 bun run typecheck
 ```
 
-`web/dist` 是纯静态文件，可放到任意静态托管。`web/public/_redirects` 提供 Cloudflare Pages 的 SPA 回退。
+`web/dist` 随 Worker 一起发布：根目录 `wrangler.jsonc` 的 `assets` 指向它，`run_worker_first` 把 `/v1/*` 与 `/health` 留给 Worker，其余路径出静态站，`not_found_handling: single-page-application` 负责前端路由回退。站点与 API 同在 `https://ai.sohx.asia`。
 
 ```sh
-cd web
-npx wrangler pages deploy dist --project-name=rollwood-api
+cd web && bun run build   # 前端有改动时先构建
+wrangler deploy           # 在仓库根目录发布
 ```
 
 ## 接口
