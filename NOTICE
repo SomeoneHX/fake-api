@@ -1,0 +1,55 @@
+fake-api Notices
+
+fake-api
+Copyright (c) 2026 SomeoneHX and contributors.
+
+This repository is licensed under the GNU Affero General Public License v3.0.
+See LICENSE for the full project license terms.
+
+==== web/ — modified New API frontend ====
+
+Copyright (C) 2023-2026 QuantumNous
+
+web/ is a modified copy of the frontend of New API
+(https://github.com/QuantumNous/new-api), which is licensed under the GNU
+Affero General Public License v3.0.
+
+Changes made for this repository: the authentication, console, ranking, setup
+and legal pages and their supporting modules were removed; the site name and
+user-facing copy were changed; site status, model pricing and about content are
+read from built-in constants under web/src/static/ instead of the backend API.
+Refer to the repository history for the complete list of changes.
+
+Pursuant to Section 7(b) of the GNU Affero General Public License version 3,
+the following reasonable legal notice and author attribution must be preserved
+by modified versions in the Appropriate Legal Notices and in any prominent
+about, legal, footer, or attribution location presented by the user interface:
+
+"Frontend design and development by New API contributors."
+
+Modified versions that present a user interface must also preserve a visible
+link to the original project in a prominent about, legal, footer, or
+attribution location:
+
+https://github.com/QuantumNous/new-api
+
+Modified versions must not misrepresent the origin of the software and must
+mark their changes in accordance with AGPLv3 Section 7(c).
+
+The copyright and license header retained at the top of each file under web/src/
+is part of the Appropriate Legal Notices of this repository.
+
+==== Fingerprint data — lm-detector ====
+
+src/fingerprint/data/fingerprints.txt is generated from the reference data of
+lm-fingerpoint-detector (https://github.com/Ikaleio/lm-detector), MIT License.
+The generator reads that repository read-only. No model weights or credentials
+are included in this repository.
+
+==== Frontend third-party dependencies ====
+
+The frontend bundles third-party npm packages. Their copyright notices and
+license texts are emitted alongside the bundles as *.LICENSE.txt files under
+web/dist/static/ when web/ is built.
+
+==== End of Notices ====

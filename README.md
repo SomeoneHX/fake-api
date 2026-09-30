@@ -98,4 +98,6 @@ node scripts/build-fingerprints.mjs [unified_reference.jsonl] [unified_bank.json
 
 ## 数据来源与许可
 
+本仓库以 [GNU Affero General Public License v3.0](LICENSE) 发布。`web/` 移植自 [New API](https://github.com/QuantumNous/new-api) 的前端（Copyright (C) 2023-2026 QuantumNous，同为 AGPL-3.0），来源、修改说明与上游附加条款见 [NOTICE](NOTICE)。
+
 指纹数据取自 lm-detector 的参考库（MIT），生成脚本对该库只读。仓库里不含任何真实模型的权重或凭据。

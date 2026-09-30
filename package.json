@@ -2,6 +2,7 @@
   "name": "fake-openai-api",
   "version": "0.1.0",
   "private": true,
+  "license": "AGPL-3.0-or-later",
   "type": "module",
   "description": "A Cloudflare Worker that impersonates an OpenAI-compatible API and replays LM fingerprint samples from lm-detector.",
   "scripts": {
