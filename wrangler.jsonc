@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "fake-openai-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-22",
+  "rules": [
+    { "type": "Text", "globs": ["**/*.txt"], "fallthrough": true }
+  ],
+  "vars": {
+    "API_KEY": "",
+    "FALLBACK_TEXT": "这是一个演示用的 OpenAI 兼容接口。除数值选择任务外，所有请求都会返回这段固定文本。",
+    "MODEL_ALIASES": "{}",
+    "STREAM_PACING_MS": "0"
+  },
+  "observability": { "enabled": true }
+}
