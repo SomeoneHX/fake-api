@@ -234,7 +234,7 @@ export const PricingSidebar = memo(function PricingSidebar(
       label: quotaTypeLabels[QUOTA_TYPES.TASK],
       count: counts.quotas.task,
     },
-  ]
+  ].filter((option) => option.value === QUOTA_TYPES.ALL || option.count > 0)
 
   const tagOptions: FilterOption[] = [
     {
@@ -261,7 +261,8 @@ export const PricingSidebar = memo(function PricingSidebar(
         value,
         label,
         count: counts.endpoints.get(value) ?? 0,
-      })),
+      }))
+      .filter((option) => option.count > 0),
   ]
 
   return (
@@ -305,12 +306,14 @@ export const PricingSidebar = memo(function PricingSidebar(
           options={vendorOptions}
           onChange={props.onVendorChange}
         />
-        <FilterSection
-          title={t('Model Tags')}
-          value={props.tagFilter}
-          options={tagOptions}
-          onChange={props.onTagChange}
-        />
+        {props.tags.length > 0 && (
+          <FilterSection
+            title={t('Model Tags')}
+            value={props.tagFilter}
+            options={tagOptions}
+            onChange={props.onTagChange}
+          />
+        )}
         <FilterSection
           title={t('Pricing Type')}
           value={props.quotaTypeFilter}

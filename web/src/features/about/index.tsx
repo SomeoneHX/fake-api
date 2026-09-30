@@ -39,6 +39,9 @@ function EmptyAboutState() {
         <p className='text-muted-foreground text-sm leading-relaxed'>
           统一接入多家模型的接口网关，兼容 OpenAI、Anthropic 与 Gemini 协议。
         </p>
+        <p className='bg-muted/50 border-border text-foreground mx-auto max-w-xl rounded-lg border px-4 py-3 text-sm font-medium'>
+          本站并非真正的API站，纯属整活，切勿当真！
+        </p>
         <p className='text-muted-foreground/50 text-xs'>
           界面基于 New API 构建，遵循 AGPL-3.0 许可。
         </p>
