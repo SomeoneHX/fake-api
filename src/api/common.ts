@@ -1,7 +1,6 @@
 import { asArray, asString, errorResponse, isRecord } from '../http'
 import { randomSeed } from '../fingerprint/synthesize'
 import type { Env } from '../env'
-import type { Invocation } from './invoke'
 import { chatText, headerSeed, requestSeed } from './prompt'
 
 /** 粗略的 token 估算：数字每三位一个，其余每四个字符一个。 */
@@ -19,14 +18,6 @@ export function pacing(env: Env): number {
 /** 复现用的种子：请求体优先，其次请求头，最后随机。 */
 export function seedFor(request: Request, body: Record<string, unknown>): number {
   return requestSeed(body) ?? headerSeed(request) ?? randomSeed()
-}
-
-export function invocationHeaders(invocation: Invocation, model: string): Record<string, string> {
-  return {
-    'x-fake-api-mode': invocation.mode,
-    'x-fake-api-model': invocation.fingerprint ?? model,
-    'x-fake-api-source': 'lm-detector',
-  }
 }
 
 export function parseChatBody(raw: unknown): { body: Record<string, unknown>; prompt: string; model: string } | { error: Response } {

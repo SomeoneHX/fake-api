@@ -1,10 +1,10 @@
 import { asString, errorResponse, isRecord, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
-import { invocationHeaders, pacing, roughTokens, seedFor } from './common'
+import { pacing, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
 import { completionText } from './prompt'
-import { eventStream, frame, nowSeconds, randomId, slice, withHeaders } from './sse'
+import { eventStream, frame, nowSeconds, randomId, slice } from './sse'
 
 /** 旧版 /v1/completions，只做最简形态。 */
 export async function legacyCompletions(request: Request, env: Env): Promise<Response> {
@@ -21,22 +21,21 @@ export async function legacyCompletions(request: Request, env: Env): Promise<Res
 
   const prompt = completionText(raw)
   const seed = seedFor(request, raw)
-  const invocation = invoke(env, model, prompt, seed)
+  const text = invoke(env, model, prompt, seed)
   const id = randomId('cmpl-')
   const created = nowSeconds()
   const promptTokens = roughTokens(prompt)
-  const completionTokens = roughTokens(invocation.text)
+  const completionTokens = roughTokens(text)
   const usage = { prompt_tokens: promptTokens, completion_tokens: completionTokens, total_tokens: promptTokens + completionTokens }
-  const headers = invocationHeaders(invocation, model)
 
   if (raw.stream === true) {
-    const chunk = (text: string, finishReason: string | null) => frame(null, {
-      id, object: 'text_completion', created, model, choices: [{ text, index: 0, logprobs: null, finish_reason: finishReason }],
+    const chunk = (piece: string, finishReason: string | null) => frame(null, {
+      id, object: 'text_completion', created, model, choices: [{ text: piece, index: 0, logprobs: null, finish_reason: finishReason }],
     })
-    const frames = slice(invocation.text, createRng(seed)).map((piece) => chunk(piece, null))
+    const frames = slice(text, createRng(seed)).map((piece) => chunk(piece, null))
     frames.push(chunk('', 'stop'))
     frames.push(frame(null, '[DONE]'))
-    return withHeaders(eventStream(frames, pacing(env)), headers)
+    return eventStream(frames, pacing(env))
   }
 
   return jsonResponse({
@@ -44,7 +43,7 @@ export async function legacyCompletions(request: Request, env: Env): Promise<Res
     object: 'text_completion',
     created,
     model,
-    choices: [{ text: invocation.text, index: 0, logprobs: null, finish_reason: 'stop' }],
+    choices: [{ text, index: 0, logprobs: null, finish_reason: 'stop' }],
     usage,
-  }, { headers })
+  })
 }

@@ -1,10 +1,10 @@
 import { asRecord, asString, errorResponse, isRecord, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
-import { invocationHeaders, pacing, roughTokens, seedFor } from './common'
-import { invoke, type Invocation } from './invoke'
+import { pacing, roughTokens, seedFor } from './common'
+import { invoke } from './invoke'
 import { responsesText } from './prompt'
-import { eventStream, frame, nowSeconds, randomId, slice, withHeaders } from './sse'
+import { eventStream, frame, nowSeconds, randomId, slice } from './sse'
 
 function outputText(text: string): unknown[] {
   return [{
@@ -16,7 +16,7 @@ function outputText(text: string): unknown[] {
   }]
 }
 
-function payload(model: string, id: string, created: number, invocation: Invocation, usage: Record<string, unknown>): Record<string, unknown> {
+function payload(model: string, id: string, created: number, text: string, usage: Record<string, unknown>): Record<string, unknown> {
   return {
     id,
     object: 'response',
@@ -28,8 +28,8 @@ function payload(model: string, id: string, created: number, invocation: Invocat
     instructions: null,
     max_output_tokens: null,
     model,
-    output: outputText(invocation.text),
-    output_text: invocation.text,
+    output: outputText(text),
+    output_text: text,
     parallel_tool_calls: true,
     previous_response_id: null,
     prompt_cache_key: null,
@@ -66,11 +66,11 @@ export async function createResponse(request: Request, env: Env): Promise<Respon
 
   const prompt = responsesText(raw)
   const seed = seedFor(request, raw)
-  const invocation = invoke(env, model, prompt, seed)
+  const text = invoke(env, model, prompt, seed)
   const id = randomId('resp_')
   const created = nowSeconds()
   const inputTokens = roughTokens(prompt)
-  const outputTokens = roughTokens(invocation.text)
+  const outputTokens = roughTokens(text)
   const usage = {
     input_tokens: inputTokens,
     input_tokens_details: { cached_tokens: 0 },
@@ -78,8 +78,7 @@ export async function createResponse(request: Request, env: Env): Promise<Respon
     output_tokens_details: { reasoning_tokens: 0 },
     total_tokens: inputTokens + outputTokens,
   }
-  const body = payload(model, id, created, invocation, usage)
-  const headers = invocationHeaders(invocation, model)
+  const body = payload(model, id, created, text, usage)
 
   if (raw.stream === true) {
     let sequence = 0
@@ -94,16 +93,16 @@ export async function createResponse(request: Request, env: Env): Promise<Respon
     push('response.in_progress', { response: { ...body, status: 'in_progress', output: [], output_text: '', usage: null } })
     push('response.output_item.added', { output_index: 0, item: { ...item, status: 'in_progress', content: [] } })
     push('response.content_part.added', { item_id: item.id, output_index: 0, content_index: 0, part: { ...part, text: '' } })
-    for (const piece of slice(invocation.text, createRng(seed))) {
+    for (const piece of slice(text, createRng(seed))) {
       push('response.output_text.delta', { item_id: item.id, output_index: 0, content_index: 0, delta: piece, logprobs: [] })
     }
-    push('response.output_text.done', { item_id: item.id, output_index: 0, content_index: 0, text: invocation.text, logprobs: [] })
+    push('response.output_text.done', { item_id: item.id, output_index: 0, content_index: 0, text, logprobs: [] })
     push('response.content_part.done', { item_id: item.id, output_index: 0, content_index: 0, part })
     push('response.output_item.done', { output_index: 0, item })
     push('response.completed', { response: body })
 
-    return withHeaders(eventStream(events, pacing(env)), headers)
+    return eventStream(events, pacing(env))
   }
 
-  return jsonResponse(body, { headers })
+  return jsonResponse(body)
 }

@@ -34,12 +34,6 @@ export function eventStream(frames: string[], pacingMs = 0): Response {
   return new Response(body, { headers: { ...SSE_HEADERS, ...corsHeaders() } })
 }
 
-/** 给流式响应补上标记头。 */
-export function withHeaders(response: Response, headers: Record<string, string>): Response {
-  for (const [key, value] of Object.entries(headers)) response.headers.set(key, value)
-  return response
-}
-
 /** 把一段文本切成大小不一的小块，模拟模型逐 token 输出。 */
 export function slice(text: string, rng: () => number, minimum = 18, spread = 48): string[] {
   const pieces: string[] = []
