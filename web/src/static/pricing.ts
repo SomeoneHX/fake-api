@@ -3,7 +3,7 @@ import type { PricingData, PricingModel } from '@/features/pricing/types'
 /**
  * `/api/pricing` 的替身。
  *
- * 模型清单与 Worker 的 `/v1/models` 一致：53 个模型，按 id 字典序排列。
+ * 模型清单是 Worker 的 `/v1/models` 快照：53 个模型，顺序与接口返回一致。
  * 价格一律为 0——输入价（USD / 百万 token）= model_ratio × 2，输出价再乘 completion_ratio。
  */
 
@@ -47,12 +47,12 @@ const MODEL_NAMES = [
   'claude-opus-5',
   'claude-fable-5.1',
   'claude-fable-5',
-  'claude-haiku-4-5-20251001',
-  'claude-opus-4-6',
-  'claude-opus-4-7',
-  'claude-opus-4-8',
-  'claude-opus-5-5',
-  'claude-sonnet-4-6',
+  'claude-haiku-4.5',
+  'claude-opus-4.6',
+  'claude-opus-4.7',
+  'claude-opus-4.8',
+  'claude-opus-5.5',
+  'claude-sonnet-4.6',
   'claude-sonnet-5',
   'claude-sonnet-5.5',
 
@@ -84,7 +84,7 @@ const MODEL_NAMES = [
   'gpt-6-astra',
   'gpt-6-luna',
   'gpt-6-sol',
-  'gpt-6-sol-20260922',
+  'gpt-6.1-sol',
 
   'grok-4.5',
   'grok-4.6',
