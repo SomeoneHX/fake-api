@@ -79,16 +79,16 @@ export function useTopNavLinks(): TopNavLink[] {
     links.push({ title: t('Model Square'), href: '/pricing', requiresAuth })
   }
 
-  // Playground
-  if (modules?.playground !== false) {
-    links.push({ title: t('Playground'), href: '/playground' })
-  }
-
   // Rankings
   const rankings = modules?.rankings
   if (rankings && typeof rankings === 'object' && rankings.enabled) {
     const requiresAuth = rankings.requireAuth && !isAuthed
     links.push({ title: t('Rankings'), href: '/rankings', requiresAuth })
+  }
+
+  // Playground
+  if (modules?.playground !== false) {
+    links.push({ title: t('Playground'), href: '/playground' })
   }
 
   // Docs (supports external links)

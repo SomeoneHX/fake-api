@@ -12,8 +12,15 @@
   "assets": {
     "directory": "web/dist",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/v1/*", "/health"]
+    "run_worker_first": ["/v1/*", "/api/*", "/health"]
   },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "fake-openai-usage",
+      "database_id": "1c0a3c27-f7a7-481c-a9c7-debece2d526b"
+    }
+  ],
   "vars": {
     "API_KEY": "",
     "MODEL_ALIASES": "{}",

@@ -2,6 +2,7 @@ import { bankInfo, modelDetail, modelList } from './api/models'
 import { chatCompletions } from './api/chat'
 import { createResponse } from './api/responses'
 import { legacyCompletions } from './api/completions'
+import { rankings } from './api/rankings'
 import { asString, corsHeaders, errorResponse } from './http'
 import type { Env } from './env'
 
@@ -20,7 +21,7 @@ function normalise(pathname: string): string {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url)
     const path = normalise(url.pathname)
 
@@ -34,6 +35,9 @@ export default {
       })
     }
 
+    // 网页直接读，和 /health 一样放在鉴权之前
+    if (path === '/api/rankings' && request.method === 'GET') return rankings(request, env)
+
     if (!authorized(request, env)) {
       return errorResponse(401, 'Incorrect API key provided.', 'invalid_request_error', 'invalid_api_key')
     }
@@ -44,9 +48,9 @@ export default {
     }
 
     if (request.method === 'POST') {
-      if (path === '/v1/chat/completions') return chatCompletions(request, env)
-      if (path === '/v1/responses') return createResponse(request, env)
-      if (path === '/v1/completions') return legacyCompletions(request, env)
+      if (path === '/v1/chat/completions') return chatCompletions(request, env, ctx)
+      if (path === '/v1/responses') return createResponse(request, env, ctx)
+      if (path === '/v1/completions') return legacyCompletions(request, env, ctx)
     }
 
     return errorResponse(404, `Unknown request URL: ${request.method} ${url.pathname}`, 'invalid_request_error', 'unknown_url')

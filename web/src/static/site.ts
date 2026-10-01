@@ -35,7 +35,7 @@ export const SITE_STATUS: SystemStatus = {
     console: false,
     playground: true,
     pricing: { enabled: true, requireAuth: false },
-    rankings: { enabled: false, requireAuth: false },
+    rankings: { enabled: true, requireAuth: false },
     docs: false,
     about: true,
   },

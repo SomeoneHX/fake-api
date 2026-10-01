@@ -1,6 +1,7 @@
 import { asRecord, asString, errorResponse, isRecord, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
+import { recordUsage, usageChars } from '../usage'
 import { pacing, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
 import { responsesText } from './prompt'
@@ -50,7 +51,7 @@ function payload(model: string, id: string, created: number, text: string, usage
   }
 }
 
-export async function createResponse(request: Request, env: Env): Promise<Response> {
+export async function createResponse(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   let raw: unknown
   try {
     raw = await request.json()
@@ -67,6 +68,7 @@ export async function createResponse(request: Request, env: Env): Promise<Respon
   const prompt = responsesText(raw)
   const seed = seedFor(request, raw)
   const text = invoke(env, model, prompt, seed)
+  recordUsage(env, ctx, model, usageChars(prompt, text))
   const id = randomId('resp_')
   const created = nowSeconds()
   const inputTokens = roughTokens(prompt)

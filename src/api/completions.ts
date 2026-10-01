@@ -1,13 +1,14 @@
 import { asString, errorResponse, isRecord, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
+import { recordUsage, usageChars } from '../usage'
 import { pacing, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
 import { completionText } from './prompt'
 import { eventStream, frame, nowSeconds, randomId, slice } from './sse'
 
 /** 旧版 /v1/completions，只做最简形态。 */
-export async function legacyCompletions(request: Request, env: Env): Promise<Response> {
+export async function legacyCompletions(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   let raw: unknown
   try {
     raw = await request.json()
@@ -22,6 +23,7 @@ export async function legacyCompletions(request: Request, env: Env): Promise<Res
   const prompt = completionText(raw)
   const seed = seedFor(request, raw)
   const text = invoke(env, model, prompt, seed)
+  recordUsage(env, ctx, model, usageChars(prompt, text))
   const id = randomId('cmpl-')
   const created = nowSeconds()
   const promptTokens = roughTokens(prompt)

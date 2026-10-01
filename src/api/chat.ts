@@ -1,11 +1,12 @@
 import { asRecord, errorResponse, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
+import { recordUsage, usageChars } from '../usage'
 import { pacing, parseChatBody, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
 import { eventStream, frame, nowSeconds, randomId, slice } from './sse'
 
-export async function chatCompletions(request: Request, env: Env): Promise<Response> {
+export async function chatCompletions(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   let raw: unknown
   try {
     raw = await request.json()
@@ -18,6 +19,7 @@ export async function chatCompletions(request: Request, env: Env): Promise<Respo
 
   const seed = seedFor(request, body)
   const text = invoke(env, model, prompt, seed)
+  recordUsage(env, ctx, model, usageChars(prompt, text))
   const id = randomId('chatcmpl-')
   const created = nowSeconds()
   const promptTokens = roughTokens(prompt)
