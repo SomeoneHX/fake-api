@@ -79,6 +79,11 @@ export function useTopNavLinks(): TopNavLink[] {
     links.push({ title: t('Model Square'), href: '/pricing', requiresAuth })
   }
 
+  // Playground
+  if (modules?.playground !== false) {
+    links.push({ title: t('Playground'), href: '/playground' })
+  }
+
   // Rankings
   const rankings = modules?.rankings
   if (rankings && typeof rankings === 'object' && rankings.enabled) {

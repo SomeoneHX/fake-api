@@ -33,6 +33,7 @@ export const SITE_STATUS: SystemStatus = {
   HeaderNavModules: {
     home: true,
     console: false,
+    playground: true,
     pricing: { enabled: true, requireAuth: false },
     rankings: { enabled: false, requireAuth: false },
     docs: false,

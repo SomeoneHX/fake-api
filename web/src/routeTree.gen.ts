@@ -16,6 +16,7 @@ import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors500RouteImport } from './routes/(errors)/500'
 import { Route as errors503RouteImport } from './routes/(errors)/503'
 import { Route as AboutIndexRouteImport } from './routes/about/index'
+import { Route as PlaygroundIndexRouteImport } from './routes/playground/index'
 import { Route as PricingIndexRouteImport } from './routes/pricing/index'
 import { Route as PricingModelIdIndexRouteImport } from './routes/pricing/$modelId/index'
 
@@ -54,6 +55,11 @@ const AboutIndexRoute = AboutIndexRouteImport.update({
   path: '/about/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaygroundIndexRoute = PlaygroundIndexRouteImport.update({
+  id: '/playground/',
+  path: '/playground/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingIndexRoute = PricingIndexRouteImport.update({
   id: '/pricing/',
   path: '/pricing/',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/about/': typeof AboutIndexRoute
+  '/playground/': typeof PlaygroundIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/pricing/$modelId/': typeof PricingModelIdIndexRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/about': typeof AboutIndexRoute
+  '/playground': typeof PlaygroundIndexRoute
   '/pricing': typeof PricingIndexRoute
   '/pricing/$modelId': typeof PricingModelIdIndexRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/about/': typeof AboutIndexRoute
+  '/playground/': typeof PlaygroundIndexRoute
   '/pricing/': typeof PricingIndexRoute
   '/pricing/$modelId/': typeof PricingModelIdIndexRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/about/'
+    | '/playground/'
     | '/pricing/'
     | '/pricing/$modelId/'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/about'
+    | '/playground'
     | '/pricing'
     | '/pricing/$modelId'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/about/'
+    | '/playground/'
     | '/pricing/'
     | '/pricing/$modelId/'
   fileRoutesById: FileRoutesById
@@ -143,6 +155,7 @@ export interface RootRouteChildren {
   errors500Route: typeof errors500Route
   errors503Route: typeof errors503Route
   AboutIndexRoute: typeof AboutIndexRoute
+  PlaygroundIndexRoute: typeof PlaygroundIndexRoute
   PricingIndexRoute: typeof PricingIndexRoute
   PricingModelIdIndexRoute: typeof PricingModelIdIndexRoute
 }
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playground/': {
+      id: '/playground/'
+      path: '/playground'
+      fullPath: '/playground/'
+      preLoaderRoute: typeof PlaygroundIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing/': {
       id: '/pricing/'
       path: '/pricing'
@@ -223,6 +243,7 @@ const rootRouteChildren: RootRouteChildren = {
   errors500Route: errors500Route,
   errors503Route: errors503Route,
   AboutIndexRoute: AboutIndexRoute,
+  PlaygroundIndexRoute: PlaygroundIndexRoute,
   PricingIndexRoute: PricingIndexRoute,
   PricingModelIdIndexRoute: PricingModelIdIndexRoute,
 }
