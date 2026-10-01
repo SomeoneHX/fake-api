@@ -41,6 +41,12 @@ interface FooterProps {
   className?: string
 }
 
+const NEW_API_FOOTER_ATTRIBUTION_KEY = [
+  'footer',
+  'new' + 'api',
+  'projectAttributionSuffix',
+].join('.')
+
 function FooterLinkItem(props: { link: FooterLink }) {
   const { t } = useTranslation()
   const isExternal = props.link.href.startsWith('http')
@@ -66,6 +72,32 @@ function FooterLinkItem(props: { link: FooterLink }) {
     >
       {label}
     </Link>
+  )
+}
+
+function ProjectAttribution(props: { currentYear: number; inline?: boolean }) {
+  const { t } = useTranslation()
+  const content = (
+    <span className='text-muted-foreground/45'>
+      &copy; {props.currentYear}{' '}
+      <a
+        href='https://github.com/QuantumNous/new-api'
+        target='_blank'
+        rel='noopener noreferrer'
+        className='text-foreground/70 hover:text-foreground font-medium transition-colors'
+      >
+        {t('New API')}
+      </a>
+      . {t(NEW_API_FOOTER_ATTRIBUTION_KEY)}
+    </span>
+  )
+  if (props.inline) {
+    return content
+  }
+  return (
+    <div className='text-muted-foreground/45 text-center text-xs sm:text-right'>
+      {content}
+    </div>
   )
 }
 
@@ -96,6 +128,7 @@ export function Footer(props: FooterProps) {
               <span>
                 &copy; {currentYear} {displayName}
               </span>
+              <ProjectAttribution currentYear={currentYear} inline />
             </div>
           </div>
         </div>
@@ -151,6 +184,7 @@ export function Footer(props: FooterProps) {
           <span className='text-muted-foreground/40 text-xs'>
             &copy; {currentYear} {displayName}. {props.copyright ?? ''}
           </span>
+          <ProjectAttribution currentYear={currentYear} />
         </div>
       </div>
     </footer>
