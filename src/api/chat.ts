@@ -1,7 +1,7 @@
 import { asRecord, errorResponse, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
-import { recordUsage, usageChars } from '../usage'
+import { recordUsage } from '../usage'
 import { pacing, parseChatBody, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
 import { eventStream, frame, nowSeconds, randomId, slice } from './sse'
@@ -19,7 +19,7 @@ export async function chatCompletions(request: Request, env: Env, ctx: Execution
 
   const seed = seedFor(request, body)
   const text = invoke(env, model, prompt, seed)
-  recordUsage(env, ctx, model, usageChars(prompt, text))
+  recordUsage(env, ctx, request, { model, prompt, completion: text })
   const id = randomId('chatcmpl-')
   const created = nowSeconds()
   const promptTokens = roughTokens(prompt)

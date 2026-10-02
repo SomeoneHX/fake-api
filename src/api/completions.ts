@@ -1,7 +1,7 @@
 import { asString, errorResponse, isRecord, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
-import { recordUsage, usageChars } from '../usage'
+import { recordUsage } from '../usage'
 import { pacing, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
 import { completionText } from './prompt'
@@ -23,7 +23,7 @@ export async function legacyCompletions(request: Request, env: Env, ctx: Executi
   const prompt = completionText(raw)
   const seed = seedFor(request, raw)
   const text = invoke(env, model, prompt, seed)
-  recordUsage(env, ctx, model, usageChars(prompt, text))
+  recordUsage(env, ctx, request, { model, prompt, completion: text })
   const id = randomId('cmpl-')
   const created = nowSeconds()
   const promptTokens = roughTokens(prompt)
