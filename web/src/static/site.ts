@@ -10,7 +10,7 @@ export type { SystemStatus }
  * `/api/status` 的替身。
  *
  * HeaderNavModules 决定顶栏出现哪些入口：home、console、pricing、rankings、
- * about 打开，docs 关闭。
+ * about 打开，playground 与 docs 关闭——游乐场挂在控制台侧栏里。
  */
 export const SITE_STATUS: SystemStatus = {
   version: 'v1.0.0',
@@ -30,7 +30,7 @@ export const SITE_STATUS: SystemStatus = {
   HeaderNavModules: {
     home: true,
     console: true,
-    playground: true,
+    playground: false,
     pricing: { enabled: true, requireAuth: false },
     rankings: { enabled: true, requireAuth: false },
     docs: false,
