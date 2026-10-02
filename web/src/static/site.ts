@@ -9,8 +9,8 @@ export type { SystemStatus }
 /**
  * `/api/status` 的替身。
  *
- * HeaderNavModules 决定顶栏出现哪些入口：home、pricing、rankings、about 打开，
- * console 与 docs 关闭。
+ * HeaderNavModules 决定顶栏出现哪些入口：home、console、pricing、rankings、
+ * about 打开，docs 关闭。
  */
 export const SITE_STATUS: SystemStatus = {
   version: 'v1.0.0',
@@ -29,7 +29,7 @@ export const SITE_STATUS: SystemStatus = {
   display_token_stat_enabled: false,
   HeaderNavModules: {
     home: true,
-    console: false,
+    console: true,
     playground: true,
     pricing: { enabled: true, requireAuth: false },
     rankings: { enabled: true, requireAuth: false },

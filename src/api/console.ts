@@ -52,6 +52,9 @@ function listPayload() {
   return { items: [], data: [], total: 0, page: 1, page_size: 20 }
 }
 
+/** 这些接口的 data 是字符串（公告、协议正文），前端会直接 .trim()。 */
+const TEXT_PATHS = ['/api/notice', '/api/user-agreement', '/api/privacy-policy']
+
 export function consoleApi(request: Request): Response {
   const path = new URL(request.url).pathname
 
@@ -59,6 +62,10 @@ export function consoleApi(request: Request): Response {
   // 若这里回 200，访客会被自动当成已登录，登录页就永远看不到了。
   if (path === '/api/user/auth/refresh' || path === '/api/user/auth/logout') {
     return errorResponse(401, 'Unauthorized', 'invalid_request_error', 'unauthorized')
+  }
+
+  if (TEXT_PATHS.includes(path)) {
+    return jsonResponse({ success: true, message: '', data: '' })
   }
 
   if (path === '/api/status') {
