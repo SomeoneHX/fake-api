@@ -39,14 +39,14 @@ const LIST_PREFIXES = [
 const TEXT_PATHS = ['/api/notice', '/api/user-agreement', '/api/privacy-policy']
 
 const FAKE_USER = {
-  id: 1,
-  username: 'admin',
-  display_name: 'admin',
-  role: 100,
+  id: 2,
+  username: 'user',
+  display_name: 'user',
+  role: 1,
   status: 1,
   email: '',
   group: 'default',
-  quota: 0,
+  quota: 500000000,
   used_quota: 0,
   request_count: 0,
   aff_code: 'rollwood',

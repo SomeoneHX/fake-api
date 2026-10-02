@@ -25,6 +25,7 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { ForbiddenError } from '@/features/errors/forbidden'
 import { GeneralError } from '@/features/errors/general-error'
+import { LoginFailedError } from '@/features/errors/login-failed'
 import { MaintenanceError } from '@/features/errors/maintenance-error'
 import { NotFoundError } from '@/features/errors/not-found-error'
 import { UnauthorisedError } from '@/features/errors/unauthorized-error'
@@ -42,6 +43,7 @@ function RouteComponent() {
     'not-found': NotFoundError,
     'internal-server-error': GeneralError,
     'maintenance-error': MaintenanceError,
+    'login-failed': LoginFailedError,
   }
   const ErrorComponent = errorMap[error] || NotFoundError
 

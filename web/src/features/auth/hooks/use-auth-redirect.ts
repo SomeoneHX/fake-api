@@ -50,7 +50,7 @@ export function useAuthRedirect() {
    * @param redirectTo - Redirect path after login
    */
   const handleLoginSuccess = useCallback(
-    async (bundle: AuthBundle, redirectTo?: string) => {
+    async (bundle: AuthBundle, _redirectTo?: string) => {
       if (
         !mounted.current ||
         useAuthStore.getState().auth.session?.sid !== sessionID
@@ -63,9 +63,13 @@ export function useAuthRedirect() {
         await i18n.changeLanguage(savedLang)
       }
 
-      const targetPath =
-        sanitizeAuthRedirect(redirectTo, window.location.origin) ?? '/dashboard'
-      await navigate({ href: targetPath, replace: true })
+      // 本站的登录只走过场，但落点是一个「登录失败」页：会话已经写好，
+      // 页面却告诉用户出了问题。
+      await navigate({
+        to: '/errors/$error',
+        params: { error: 'login-failed' },
+        replace: true,
+      })
     },
     [navigate, sessionID]
   )
