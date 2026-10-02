@@ -16,10 +16,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { api } from '@/lib/api'
-import { requireServerSuccess } from '@/lib/server-error-message'
-
 import { API_ENDPOINTS, DEFAULT_GROUP } from './constants'
+import { getPlaygroundHeaders } from './lib/playground-key'
 import type {
   ChatCompletionRequest,
   ChatCompletionResponse,
@@ -34,20 +32,26 @@ export async function sendChatCompletion(
   payload: ChatCompletionRequest,
   signal?: AbortSignal
 ): Promise<ChatCompletionResponse> {
-  const res = await api.post(API_ENDPOINTS.CHAT_COMPLETIONS, payload, {
+  const headers = await getPlaygroundHeaders()
+  const res = await fetch(API_ENDPOINTS.CHAT_COMPLETIONS, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(payload),
     signal,
-    skipErrorHandler: true,
-  } as Record<string, unknown>)
-  return res.data
+  })
+  return (await res.json()) as ChatCompletionResponse
 }
 
 /**
  * Get the models the backend serves
  */
 export async function getUserModels(): Promise<ModelOption[]> {
-  const res = await api.get(API_ENDPOINTS.MODELS, { skipErrorHandler: true })
-  const { data } = res
-  requireServerSuccess(data)
+  const headers = await getPlaygroundHeaders()
+  const res = await fetch(API_ENDPOINTS.MODELS, { headers })
+  if (!res.ok) {
+    return []
+  }
+  const data = (await res.json()) as { data?: unknown }
 
   const models = data?.data
   if (!Array.isArray(models)) {

@@ -1,12 +1,13 @@
 import { asRecord, errorResponse, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
+import type { TokenAuth } from '../auth'
 import { recordUsage } from '../usage'
 import { pacing, parseChatBody, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
 import { eventStream, frame, nowSeconds, randomId, slice } from './sse'
 
-export async function chatCompletions(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+export async function chatCompletions(request: Request, env: Env, ctx: ExecutionContext, token: TokenAuth): Promise<Response> {
   let raw: unknown
   try {
     raw = await request.json()
@@ -19,7 +20,7 @@ export async function chatCompletions(request: Request, env: Env, ctx: Execution
 
   const seed = seedFor(request, body)
   const text = invoke(env, model, prompt, seed)
-  recordUsage(env, ctx, request, { model, prompt, completion: text })
+  recordUsage(env, ctx, request, { model, prompt, completion: text }, token)
   const id = randomId('chatcmpl-')
   const created = nowSeconds()
   const promptTokens = roughTokens(prompt)

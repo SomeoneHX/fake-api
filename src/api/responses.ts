@@ -1,6 +1,7 @@
 import { asRecord, asString, errorResponse, isRecord, jsonResponse } from '../http'
 import type { Env } from '../env'
 import { createRng } from '../fingerprint/synthesize'
+import type { TokenAuth } from '../auth'
 import { recordUsage } from '../usage'
 import { pacing, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
@@ -51,7 +52,7 @@ function payload(model: string, id: string, created: number, text: string, usage
   }
 }
 
-export async function createResponse(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+export async function createResponse(request: Request, env: Env, ctx: ExecutionContext, token: TokenAuth): Promise<Response> {
   let raw: unknown
   try {
     raw = await request.json()
@@ -68,7 +69,7 @@ export async function createResponse(request: Request, env: Env, ctx: ExecutionC
   const prompt = responsesText(raw)
   const seed = seedFor(request, raw)
   const text = invoke(env, model, prompt, seed)
-  recordUsage(env, ctx, request, { model, prompt, completion: text })
+  recordUsage(env, ctx, request, { model, prompt, completion: text }, token)
   const id = randomId('resp_')
   const created = nowSeconds()
   const inputTokens = roughTokens(prompt)

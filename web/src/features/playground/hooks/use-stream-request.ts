@@ -21,6 +21,7 @@ import { SSE } from 'sse.js'
 
 import { getCommonHeaders } from '@/lib/api'
 
+import { getPlaygroundHeaders, clearCachedPlaygroundKey } from '../lib/playground-key'
 import { API_ENDPOINTS, ERROR_MESSAGES } from '../constants'
 import {
   getStreamReadyStateError,
@@ -104,6 +105,9 @@ export function createStreamRequestController(
       generation === requestGeneration && source === nextSource
 
     const handleError = (errorMessage: string, errorCode?: string) => {
+      if (errorMessage.includes('Incorrect API key')) {
+        clearCachedPlaygroundKey()
+      }
       if (!isCurrent() || completed) return
       completed = true
       callbacks.onError(errorMessage, errorCode)
@@ -190,7 +194,10 @@ export function useStreamRequest() {
   > | null>(null)
   if (!controllerRef.current) {
     controllerRef.current = createStreamRequestController({
-      getHeaders: async () => getCommonHeaders(),
+      getHeaders: async () => {
+        const keyHeaders = await getPlaygroundHeaders()
+        return keyHeaders.Authorization ? keyHeaders : getCommonHeaders()
+      },
       createSource: (payload, headers) =>
         new SSE(API_ENDPOINTS.CHAT_COMPLETIONS, {
           headers,

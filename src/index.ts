@@ -3,18 +3,12 @@ import { chatCompletions } from './api/chat'
 import { createResponse } from './api/responses'
 import { legacyCompletions } from './api/completions'
 import { consoleApi } from './api/console'
+import { logsApi } from './api/logs'
 import { tokensApi } from './api/tokens'
 import { rankings } from './api/rankings'
-import { asString, corsHeaders, errorResponse } from './http'
+import { authenticate } from './auth'
+import { corsHeaders, errorResponse } from './http'
 import type { Env } from './env'
-
-function authorized(request: Request, env: Env): boolean {
-  const expected = asString(env.API_KEY)
-  if (!expected) return true
-  const header = request.headers.get('authorization') ?? ''
-  const bearer = header.replace(/^Bearer\s+/i, '')
-  return bearer === expected || request.headers.get('x-api-key') === expected
-}
 
 function normalise(pathname: string): string {
   let path = pathname.replace(/\/+$/, '')
@@ -40,9 +34,12 @@ export default {
     // 网页直接读，和 /health 一样放在鉴权之前
     if (path === '/api/rankings' && request.method === 'GET') return rankings(request, env)
     if (path === '/api/token' || path.startsWith('/api/token/')) return tokensApi(request, env)
+    if (path.startsWith('/api/log')) return logsApi(request, env)
     if (path.startsWith('/api/')) return consoleApi(request)
 
-    if (!authorized(request, env)) {
+    // /v1 需要 tokens 表里启用的密钥（env.API_KEY 为主密钥兜底）
+    const token = await authenticate(request, env)
+    if (!token) {
       return errorResponse(401, 'Incorrect API key provided.', 'invalid_request_error', 'invalid_api_key')
     }
 
@@ -52,9 +49,9 @@ export default {
     }
 
     if (request.method === 'POST') {
-      if (path === '/v1/chat/completions') return chatCompletions(request, env, ctx)
-      if (path === '/v1/responses') return createResponse(request, env, ctx)
-      if (path === '/v1/completions') return legacyCompletions(request, env, ctx)
+      if (path === '/v1/chat/completions') return chatCompletions(request, env, ctx, token)
+      if (path === '/v1/responses') return createResponse(request, env, ctx, token)
+      if (path === '/v1/completions') return legacyCompletions(request, env, ctx, token)
     }
 
     return errorResponse(404, `Unknown request URL: ${request.method} ${url.pathname}`, 'invalid_request_error', 'unknown_url')

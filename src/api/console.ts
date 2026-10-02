@@ -21,7 +21,6 @@ const list = () =>
 /** 这些前缀按分页列表回。 */
 const LIST_PREFIXES = [
   '/api/channel',
-  '/api/log',
   '/api/user',
   '/api/redemption',
   '/api/models',
@@ -148,10 +147,6 @@ export function consoleApi(request: Request): Response {
 
   if (path === '/api/group/' || path === '/api/group') return ok([])
   if (path === '/api/uptime/status') return ok([])
-
-  if (path === '/api/log/stat' || path === '/api/log/self/stat') {
-    return ok({ quota: 0, rpm: 0, tpm: 0 })
-  }
 
   if (path === '/api/channel/ops') {
     return ok({
