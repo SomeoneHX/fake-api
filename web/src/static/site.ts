@@ -1,19 +1,16 @@
+import type { SystemStatus } from '@/features/auth/types'
+
 /** 站点标识。 */
 export const SITE_NAME = '滚木 API'
 export const SITE_TAGLINE = '你说的每一句话，都是滚木'
 
-export interface SystemStatus {
-  success?: boolean
-  message?: string
-  data?: Record<string, unknown>
-  [key: string]: unknown
-}
+export type { SystemStatus }
 
 /**
  * `/api/status` 的替身。
  *
- * HeaderNavModules 决定顶栏出现哪些入口：home 与 about 打开，
- * console、rankings、docs 关闭。
+ * HeaderNavModules 决定顶栏出现哪些入口：home、pricing、rankings、about 打开，
+ * console 与 docs 关闭。
  */
 export const SITE_STATUS: SystemStatus = {
   version: 'v1.0.0',

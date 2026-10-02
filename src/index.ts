@@ -2,6 +2,7 @@ import { bankInfo, modelDetail, modelList } from './api/models'
 import { chatCompletions } from './api/chat'
 import { createResponse } from './api/responses'
 import { legacyCompletions } from './api/completions'
+import { consoleApi } from './api/console'
 import { rankings } from './api/rankings'
 import { asString, corsHeaders, errorResponse } from './http'
 import type { Env } from './env'
@@ -37,6 +38,7 @@ export default {
 
     // 网页直接读，和 /health 一样放在鉴权之前
     if (path === '/api/rankings' && request.method === 'GET') return rankings(request, env)
+    if (path.startsWith('/api/')) return consoleApi(request)
 
     if (!authorized(request, env)) {
       return errorResponse(401, 'Incorrect API key provided.', 'invalid_request_error', 'invalid_api_key')

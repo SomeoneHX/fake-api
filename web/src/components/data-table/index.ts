@@ -48,6 +48,10 @@ export {
 export { CardRowContent } from './layout/card-row-content'
 export { tableHasCompactMeta } from './layout/card-cell-utils'
 export {
+  DataTablePage,
+  type DataTablePageProps,
+} from './layout/data-table-page'
+export {
   DataTableViewModeToggle,
   type DataTableViewModeToggleProps,
 } from './toolbar/view-mode-toggle'

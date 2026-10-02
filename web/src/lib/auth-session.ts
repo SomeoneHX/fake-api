@@ -21,6 +21,7 @@ import axios from 'axios'
 import { t } from 'i18next'
 
 import { publishAuthSessionEvent } from '@/lib/auth-session-sync'
+import { clearFakeSession, readFakeSession } from '@/lib/fake-session'
 import { hasSessionHint } from '@/lib/session-hint'
 import {
   useAuthStore,
@@ -190,6 +191,7 @@ export function clearAuthentication(
 ): void {
   const sid = useAuthStore.getState().auth.session?.sid
   authEpoch += 1
+  clearFakeSession()
   useAuthStore.getState().auth.reset(bootstrapState)
   if (synchronizeTabs && sid) {
     publishAuthSessionEvent('signed_out', sid)
@@ -332,7 +334,21 @@ async function performRefreshWithBrowserLock(
   }
 }
 
+/**
+ * 本地假会话优先：存在就直接当作已登录，不碰网络。
+ */
+function restoreFakeSession(): RefreshOutcome | null {
+  const bundle = readFakeSession()
+  if (!bundle) return null
+  useAuthStore.getState().auth.setBundle(bundle)
+  return { kind: 'authenticated', bundle }
+}
+
 export function refreshAuthentication(): Promise<RefreshOutcome> {
+  const fake = restoreFakeSession()
+  if (fake) return Promise.resolve(fake)
+  // 没有假会话时照旧走刷新；假接口对 /api/user/auth/refresh 回 401，
+  // 于是这里得到 anonymous，登录页才会出现。
   if (!refreshPromise) {
     const refreshEpoch = authEpoch
     refreshPromise = performRefreshWithBrowserLock(refreshEpoch).finally(() => {
@@ -363,14 +379,12 @@ function currentValidAuthBundle(): AuthBundle | null {
 }
 
 /**
- * Resolve authentication from memory, or from the server when memory is empty.
- *
- * Use this wherever the answer decides what the user sees: route guards that
- * redirect on the result, and the sign-in page. It contacts the server on a
- * cold cache even when no session hint is present, so a usable Refresh Cookie
- * is always honoured.
+ * 解析当前登录态。本地那份假会话优先，没有才按上游的逻辑回源刷新。
  */
 export async function resolveAuthentication(): Promise<RefreshOutcome> {
+  const fake = restoreFakeSession()
+  if (fake) return fake
+
   const bundle = currentValidAuthBundle()
   if (bundle) {
     useAuthStore.getState().auth.setBootstrapState('complete')
@@ -388,16 +402,11 @@ export async function resolveAuthentication(): Promise<RefreshOutcome> {
 }
 
 /**
- * Resolve authentication on the public boot path, skipping a refresh that the
- * server's session hint says would fail.
- *
- * The skip leaves `bootstrapState` at `idle` rather than `complete`: a missing
- * hint is not a server verdict, so it must not be recorded as a finished
- * anonymous check. `resolveAuthentication` therefore still reaches the network
- * later, which is what lets a hintless visitor holding a valid Refresh Cookie
- * recover the moment authentication actually matters.
+ * 公开页启动路径上的鉴权解析，同样先看本地那份假会话。
  */
 export async function bootstrapAuthentication(): Promise<RefreshOutcome> {
+  const fake = restoreFakeSession()
+  if (fake) return fake
   if (!currentValidAuthBundle() && !hasSessionHint()) {
     const auth = useAuthStore.getState().auth
     if (!auth.user && !auth.session) {
