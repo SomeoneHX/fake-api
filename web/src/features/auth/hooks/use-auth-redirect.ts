@@ -65,11 +65,7 @@ export function useAuthRedirect() {
 
       // 本站的登录只走过场，但落点是一个「登录失败」页：会话已经写好，
       // 页面却告诉用户出了问题。
-      await navigate({
-        to: '/errors/$error',
-        params: { error: 'login-failed' },
-        replace: true,
-      })
+      await navigate({ to: '/login-failed', replace: true })
     },
     [navigate, sessionID]
   )

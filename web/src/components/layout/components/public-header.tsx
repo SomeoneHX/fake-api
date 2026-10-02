@@ -31,6 +31,8 @@ import { SystemUpdateAction } from '@/features/system-update/system-update-actio
 import { useNotifications } from '@/hooks/use-notifications'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
+import { applyAuthBundle } from '@/lib/api'
+import { createFakeBundle, writeFakeSession } from '@/lib/fake-session'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -97,6 +99,20 @@ export function PublicHeader(props: PublicHeaderProps) {
   const user = auth.user
   const isAuthenticated = !!user
   const displaySiteName = customSiteName || systemName
+
+  // 本站没有账号体系：点登录就直接发一份假会话，不填表单，
+  // 然后落在一个「登录失败」错误页上。
+  const startFakeSignIn = useCallback(() => {
+    const bundle = createFakeBundle()
+    writeFakeSession(bundle)
+    applyAuthBundle(bundle)
+  }, [])
+
+  const navigateToSignIn = useCallback(() => {
+    setAuthPromptTarget(null)
+    startFakeSignIn()
+    navigate({ to: '/login-failed' })
+  }, [navigate, startFakeSignIn])
   const links = dynamicLinks.length > 0 ? dynamicLinks : navLinks
 
   let logoContent: ReactNode = (
@@ -114,7 +130,7 @@ export function PublicHeader(props: PublicHeaderProps) {
     <Button
       size='sm'
       className='h-8 rounded-lg px-3.5 text-xs font-medium'
-      render={<Link to='/sign-in' />}
+      onClick={navigateToSignIn}
     >
       {t('Sign in')}
     </Button>
@@ -144,27 +160,21 @@ export function PublicHeader(props: PublicHeaderProps) {
     }, 1000)
 
     const timeoutId = window.setTimeout(() => {
-      const redirect = authPromptTarget.href
       setAuthPromptTarget(null)
-      navigate({ to: '/sign-in', search: { redirect } })
+      startFakeSignIn()
+      navigate({ to: '/login-failed' })
     }, AUTH_PROMPT_SECONDS * 1000)
 
     return () => {
       window.clearInterval(intervalId)
       window.clearTimeout(timeoutId)
     }
-  }, [authPromptTarget, navigate])
+  }, [authPromptTarget, navigate, startFakeSignIn])
 
   const closeAuthPrompt = useCallback(() => {
     setAuthPromptTarget(null)
     setAuthPromptSecondsLeft(AUTH_PROMPT_SECONDS)
   }, [])
-
-  const navigateToSignIn = useCallback(() => {
-    const redirect = authPromptTarget?.href || '/'
-    setAuthPromptTarget(null)
-    navigate({ to: '/sign-in', search: { redirect } })
-  }, [authPromptTarget?.href, navigate])
 
   const handleNavLinkClick = useCallback(
     (
@@ -415,14 +425,26 @@ export function PublicHeader(props: PublicHeaderProps) {
             )}
             style={{ transitionDelay: mobileOpen ? '250ms' : '0ms' }}
           >
-            {showAuthButtons && (
+            {showAuthButtons && isAuthenticated && (
               <Link
-                to={isAuthenticated ? '/dashboard' : '/sign-in'}
+                to='/dashboard'
                 onClick={() => setMobileOpen(false)}
                 className='bg-foreground text-background inline-flex h-10 items-center justify-center rounded-lg text-sm font-medium transition-opacity hover:opacity-90 active:opacity-80'
               >
-                {isAuthenticated ? t('Go to Dashboard') : t('Sign in')}
+                {t('Go to Dashboard')}
               </Link>
+            )}
+            {showAuthButtons && !isAuthenticated && (
+              <button
+                type='button'
+                onClick={() => {
+                  setMobileOpen(false)
+                  navigateToSignIn()
+                }}
+                className='bg-foreground text-background inline-flex h-10 items-center justify-center rounded-lg text-sm font-medium transition-opacity hover:opacity-90 active:opacity-80'
+              >
+                {t('Sign in')}
+              </button>
             )}
           </div>
         </div>
