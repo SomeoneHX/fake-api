@@ -31,8 +31,6 @@ import { SystemUpdateAction } from '@/features/system-update/system-update-actio
 import { useNotifications } from '@/hooks/use-notifications'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
-import { applyAuthBundle } from '@/lib/api'
-import { createFakeBundle, writeFakeSession } from '@/lib/fake-session'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth-store'
 
@@ -100,19 +98,11 @@ export function PublicHeader(props: PublicHeaderProps) {
   const isAuthenticated = !!user
   const displaySiteName = customSiteName || systemName
 
-  // 本站没有账号体系：点登录就直接发一份假会话，不填表单，
-  // 然后落在一个「登录失败」错误页上。
-  const startFakeSignIn = useCallback(() => {
-    const bundle = createFakeBundle()
-    writeFakeSession(bundle)
-    applyAuthBundle(bundle)
-  }, [])
-
   const navigateToSignIn = useCallback(() => {
+    const redirect = authPromptTarget?.href || '/'
     setAuthPromptTarget(null)
-    startFakeSignIn()
-    navigate({ to: '/login-failed' })
-  }, [navigate, startFakeSignIn])
+    navigate({ to: '/sign-in', search: { redirect } })
+  }, [authPromptTarget?.href, navigate])
   const links = dynamicLinks.length > 0 ? dynamicLinks : navLinks
 
   let logoContent: ReactNode = (
@@ -160,16 +150,16 @@ export function PublicHeader(props: PublicHeaderProps) {
     }, 1000)
 
     const timeoutId = window.setTimeout(() => {
+      const redirect = authPromptTarget.href
       setAuthPromptTarget(null)
-      startFakeSignIn()
-      navigate({ to: '/login-failed' })
+      navigate({ to: '/sign-in', search: { redirect } })
     }, AUTH_PROMPT_SECONDS * 1000)
 
     return () => {
       window.clearInterval(intervalId)
       window.clearTimeout(timeoutId)
     }
-  }, [authPromptTarget, navigate, startFakeSignIn])
+  }, [authPromptTarget, navigate])
 
   const closeAuthPrompt = useCallback(() => {
     setAuthPromptTarget(null)

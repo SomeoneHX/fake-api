@@ -98,7 +98,9 @@ export function consoleApi(request: Request): Response {
 
   if (path === '/api/user/self' || path === '/api/user/self/') return ok(FAKE_USER)
 
-  if (path === '/api/user/self/groups') return ok({})
+  if (path === '/api/user/self/groups') {
+    return ok({ default: { ratio: 1, desc: '默认分组' } })
+  }
   if (path === '/api/user/models') return ok([])
   if (path === '/api/user/sessions') return ok([])
   if (path === '/api/user/passkey') return ok({ enabled: false, last_used_at: null })
