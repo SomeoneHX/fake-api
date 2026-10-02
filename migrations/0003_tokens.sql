@@ -1,0 +1,13 @@
+-- 密钥页的 key 存储与增删改查。key 不参与 /v1 的鉴权。
+CREATE TABLE IF NOT EXISTS tokens (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  key TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL DEFAULT '',
+  status INTEGER NOT NULL DEFAULT 1,
+  created_time INTEGER NOT NULL,
+  accessed_time INTEGER NOT NULL,
+  used_quota INTEGER NOT NULL DEFAULT 0,
+  remain_quota INTEGER NOT NULL DEFAULT 500000,
+  unlimited_quota INTEGER NOT NULL DEFAULT 1,
+  expired_time INTEGER NOT NULL DEFAULT -1
+);

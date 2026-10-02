@@ -3,6 +3,7 @@ import { chatCompletions } from './api/chat'
 import { createResponse } from './api/responses'
 import { legacyCompletions } from './api/completions'
 import { consoleApi } from './api/console'
+import { tokensApi } from './api/tokens'
 import { rankings } from './api/rankings'
 import { asString, corsHeaders, errorResponse } from './http'
 import type { Env } from './env'
@@ -38,6 +39,7 @@ export default {
 
     // 网页直接读，和 /health 一样放在鉴权之前
     if (path === '/api/rankings' && request.method === 'GET') return rankings(request, env)
+    if (path === '/api/token' || path.startsWith('/api/token/')) return tokensApi(request, env)
     if (path.startsWith('/api/')) return consoleApi(request)
 
     if (!authorized(request, env)) {

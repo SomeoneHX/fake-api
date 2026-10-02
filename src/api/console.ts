@@ -21,7 +21,6 @@ const list = () =>
 /** 这些前缀按分页列表回。 */
 const LIST_PREFIXES = [
   '/api/channel',
-  '/api/token',
   '/api/log',
   '/api/user',
   '/api/redemption',
