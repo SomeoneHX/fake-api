@@ -37,11 +37,8 @@ export default {
     if (path.startsWith('/api/log')) return logsApi(request, env)
     if (path.startsWith('/api/')) return consoleApi(request)
 
-    // /v1 需要 tokens 表里启用的密钥（env.API_KEY 为主密钥兜底）
+    // /v1 不做拦截：无 key、乱 key 都放行；key 命中 tokens 表才把流量记到那把 key 名下
     const token = await authenticate(request, env)
-    if (!token) {
-      return errorResponse(401, 'Incorrect API key provided.', 'invalid_request_error', 'invalid_api_key')
-    }
 
     if (path === '/v1/models' && request.method === 'GET') return modelList()
     if (path.startsWith('/v1/models/') && request.method === 'GET') {

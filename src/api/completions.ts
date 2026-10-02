@@ -9,7 +9,7 @@ import { completionText } from './prompt'
 import { eventStream, frame, nowSeconds, randomId, slice } from './sse'
 
 /** 旧版 /v1/completions，只做最简形态。 */
-export async function legacyCompletions(request: Request, env: Env, ctx: ExecutionContext, token: TokenAuth): Promise<Response> {
+export async function legacyCompletions(request: Request, env: Env, ctx: ExecutionContext, token: TokenAuth | null): Promise<Response> {
   let raw: unknown
   try {
     raw = await request.json()

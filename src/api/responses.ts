@@ -52,7 +52,7 @@ function payload(model: string, id: string, created: number, text: string, usage
   }
 }
 
-export async function createResponse(request: Request, env: Env, ctx: ExecutionContext, token: TokenAuth): Promise<Response> {
+export async function createResponse(request: Request, env: Env, ctx: ExecutionContext, token: TokenAuth | null): Promise<Response> {
   let raw: unknown
   try {
     raw = await request.json()

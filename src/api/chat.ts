@@ -7,7 +7,7 @@ import { pacing, parseChatBody, roughTokens, seedFor } from './common'
 import { invoke } from './invoke'
 import { eventStream, frame, nowSeconds, randomId, slice } from './sse'
 
-export async function chatCompletions(request: Request, env: Env, ctx: ExecutionContext, token: TokenAuth): Promise<Response> {
+export async function chatCompletions(request: Request, env: Env, ctx: ExecutionContext, token: TokenAuth | null): Promise<Response> {
   let raw: unknown
   try {
     raw = await request.json()
